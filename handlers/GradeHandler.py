@@ -1,8 +1,7 @@
-from tornado.web import *
+from tornado.web import RequestHandler
 from server import GradeServer
 from tornado import gen
 class GradeHandler(RequestHandler):
-
     @gen.coroutine
     def post(self):
         tempcookie=self.get_argument('cookie','none')
