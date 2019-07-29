@@ -23,4 +23,3 @@ if __name__ == "__main__":
     app.listen(8080)
     #启动web程序，开始监听端口的连接
     tornado.ioloop.IOLoop.current().start()
-# 注意json.dumps(),这个不能够正确给出body
