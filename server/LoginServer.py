@@ -8,6 +8,9 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from CNN import keras_model
 from utils.json2url import JSON2URL
+
+httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+
 req_url='http://jwgl.ntu.edu.cn/cjcx/checkImage.aspx'
 req_url_login="http://jwgl.ntu.edu.cn/cjcx/Default.aspx"
 UserAgent='Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
@@ -85,7 +88,11 @@ def login_server(username,idcard,pwd):
             backinfo =yield login_states
             # 判断登录是否成功
             if backinfo:
-                return localCookie
+                arr=backinfo.split( )[1:]
+                dict1={'cookie':localCookie}
+                for i in arr:
+                    dict1[i.split('：')[0]]=i.split('：')[1]
+                return dict1
             else:
                 return 0
         Img_val = BeforeLogin()

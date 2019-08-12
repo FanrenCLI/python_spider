@@ -4,6 +4,9 @@ from server.CourseServer import courseServer
 from tornado.httpclient import AsyncHTTPClient
 from utils.json2url import JSON2URL
 import json
+
+AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+
 class CourseHandler(RequestHandler):
     @gen.coroutine
     def post(self):

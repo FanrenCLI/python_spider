@@ -25,6 +25,14 @@ class Sqlutils():
         cur.close()
         self.conn.close()
         return result
+    def updateSelective(self,tablelist,stuid,pwd):
+        self.connection()
+        cur=self.cur
+        sqlstr="update "+tablelist+" set pwd='%s' where stuid='%s'"
+        cur.execute(sqlstr % (pwd,stuid))
+        self.conn.commit()
+        cur.close()
+        self.conn.close()
 ################################################## 
     def selectAll(self,tablelist):
         self.connection()
@@ -44,15 +52,7 @@ class Sqlutils():
         cur.close()
         self.conn.close()
         return result
-    def updateSelective(self,tablelist,stuid,openid):
-        self.connection()
-        cur=self.cur
-        sqlstr="update "+tablelist+" set openid=%s where stuid=%s"
-        cur.execute(sqlstr,(openid,stuid))
-        result=cur.fetchall()
-        cur.close()
-        self.conn.close()
-        return result
+
 # 班级课表sql语句
     def selectByClassName(self,tablelist,classname):
         self.connection()
