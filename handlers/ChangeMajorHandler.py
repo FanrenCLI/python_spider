@@ -1,7 +1,7 @@
 from tornado.web import RequestHandler
 from tornado import gen
 from server import ChangeMajorServer
-
+from models.globaldata import term
 # autoid: "1205"
 # byzszymc: "汉语言文学"
 # xq: "2018-2019-2"
@@ -13,12 +13,14 @@ from server import ChangeMajorServer
 class ChangeMajorHandler(RequestHandler):
     @gen.coroutine    
     def post(self):
-        localcookie,term=self.get_argument('cookie','none'),self.get_argument('term','none')
-        if localcookie =='none' or term=='none':
-            self.write("failure")
+        localcookie=self.get_argument('cookie','none')
+        if localcookie =='none':
+            self.finish("failure")
         res=ChangeMajorServer.change_major_server(localcookie,term,'zy')
         backinfo= yield res
-        self.write(backinfo[backinfo.index('['):backinfo.rfind(']')+1])
+        if backinfo ==None:
+            self.finish("reqfailure")
+        self.finish(backinfo[backinfo.index('['):backinfo.rfind(']')+1])
 
 # autoid: "9772"
 # byzszymc: "口腔医学"
@@ -34,12 +36,14 @@ class ChangeMajorHandler(RequestHandler):
 class YBMajorHandler(RequestHandler):
     @gen.coroutine
     def post(self):
-        localcookie,term=self.get_argument('cookie','none'),self.get_argument('term','none')
-        if localcookie =='none' or term=='none':
-            self.write("failure")
+        localcookie=self.get_argument('cookie','none')
+        if localcookie =='none':
+            self.finish("failure")
         res=ChangeMajorServer.change_major_server(localcookie,term,'ybzy')
         backinfo= yield res
-        self.write(backinfo[backinfo.index('['):backinfo.rfind(']')+1])
+        if backinfo==None:
+            self.finish("reqfailure")
+        self.finish(backinfo[backinfo.index('['):backinfo.rfind(']')+1])
 
 # autoid: "9772"
 # byzszymc: "口腔医学"
@@ -53,9 +57,11 @@ class YBMajorHandler(RequestHandler):
 class ChangeMajorGradeHandler(RequestHandler):
     @gen.coroutine
     def post(self):
-        localcookie,term=self.get_argument('cookie','none'),self.get_argument('term','none')
-        if localcookie =='none' or term=='none':
-            self.write("failure")
+        localcookie=self.get_argument('cookie','none')
+        if localcookie =='none':
+            self.finish("failure")
         res=ChangeMajorServer.change_major_grade_server(localcookie,term)
         backinfo=yield res
-        self.write(backinfo[backinfo.index('['):backinfo.rfind(']')+1])
+        if backinfo==None:
+            self.finish("reqfailure")
+        self.finish(backinfo[backinfo.index('['):backinfo.rfind(']')+1])

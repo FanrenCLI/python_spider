@@ -1,7 +1,7 @@
 from utils.json2url import JSON2URL
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
-
+from utils.IPProxyPool import Random_ProxyIP
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 @gen.coroutine
@@ -24,7 +24,14 @@ def gxk_server(term,localcookie,info):
         'type': info,
         'xq': term,
     }
-    res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')
 
 @gen.coroutine
@@ -47,7 +54,14 @@ def submit_gxk_server(localcookie,jxrwid,term):
         'jxrwid': jxrwid,
         'xq': term,
     }
-    res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')
 
 @gen.coroutine
@@ -69,5 +83,12 @@ def delete_gxk_server(localcookie,oid):
     req_body={
         'oid': oid
     }
-    res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res = yield AsyncHTTPClient().fetch(req_url,method='POST',body=JSON2URL(req_body),headers=req_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')

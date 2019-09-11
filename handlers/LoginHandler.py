@@ -21,6 +21,8 @@ class LoginHandler(RequestHandler):
             # 根据用户信息进行模拟登陆
             result= LoginServer.login_server(username,idcard,pwd)
             loginstate=yield result
+            if loginstate==None:
+                self.finish("reqfailure")
             # 登录成功则返回cookie
             if loginstate!=0:
                 # 若openid未绑定账号，则进行数据库存储操作
@@ -28,12 +30,12 @@ class LoginHandler(RequestHandler):
                     try:
                         mysql.Sqlutils().insert('userlist',UserModel)
                     except Exception:
-                        self.write('0')
-                self.write(loginstate)
+                        self.finish('0')
+                self.finish(loginstate)
             else:
-                self.write('0')
+                self.finish('0')
         else:
-            self.write('0')
+            self.finish('0')
 
 class LoginWXHander(RequestHandler):
     @gen.coroutine
@@ -44,9 +46,11 @@ class LoginWXHander(RequestHandler):
         if sqlresult:
             result= LoginServer.login_server(sqlresult[0][1],sqlresult[0][2],sqlresult[0][3])
             loginstate=yield result
+            if loginstate==None:
+                self.finish("reqfailure")
             if loginstate!=0:
-                self.write(loginstate)
+                self.finish(loginstate)
             else:
-                self.write('0')
+                self.finish('0')
         else:
-            self.write('0')
+            self.finish('0')

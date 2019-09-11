@@ -8,7 +8,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from CNN import keras_model
 from utils.json2url import JSON2URL
-
+from utils.IPProxyPool import Random_ProxyIP
 httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 req_url='http://jwgl.ntu.edu.cn/cjcx/checkImage.aspx'
@@ -31,7 +31,10 @@ def BeforeLogin():
     global get__VIEWSTATE
     global localCookie
     global get__VIEWSTATEGENERATOR
-    res=requests.post(req_url,headers=req_Header)
+    try:
+        res=requests.post(req_url,headers=req_Header)
+    except Exception:
+        return None
     # 获取VIEWSTATE用户登录相关信息
     BSresult = BeautifulSoup(res.text,'lxml')
     BSInput = BSresult.select('input')
@@ -69,8 +72,14 @@ def LoginMain(img_val,username,idcard,pwd):
         'kl': pwd,
         'yzm': img_val
     }
-
-    res= yield  httpclient.AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(login_data),headers=login_Header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res= yield  httpclient.AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(login_data),headers=login_Header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res= yield  httpclient.AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(login_data),headers=login_Header)
+        except Exception:
+            return None
     loginBackBody = BeautifulSoup(res.body.decode('utf-8'),'lxml')
     BackBodyBS = loginBackBody.select('#stuInfo')
     if len(BackBodyBS)!=0:
@@ -80,12 +89,16 @@ def LoginMain(img_val,username,idcard,pwd):
 @gen.coroutine
 def login_server(username,idcard,pwd):
     Img_val = BeforeLogin()
+    if Img_val==None:
+        return None
     while True:
         # 判断图片识别是否正确
         if Img_val!=0:
             # 发送登录请求
             login_states =  LoginMain(Img_val,username,idcard,pwd)
             backinfo =yield login_states
+            if login_states==None:
+                return None
             # 判断登录是否成功
             if backinfo:
                 arr=backinfo.split( )[1:]

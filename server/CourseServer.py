@@ -1,7 +1,7 @@
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 from utils.json2url import JSON2URL
-
+from utils.IPProxyPool import Random_ProxyIP
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 @gen.coroutine
@@ -24,5 +24,13 @@ def courseServer(term,info,localcookie):
         'xq':term,
         'bjid':info
     }
-    res= yield AsyncHTTPClient().fetch(req_URL,method='POST',body=JSON2URL(course_body),headers=course_header)
+
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res= yield AsyncHTTPClient().fetch(req_URL,method='POST',body=JSON2URL(course_body),headers=course_header,proxy_host=ip_proxy,proxy_port=proxy_port,request_timeout=0.5)
+    except Exception:
+        try:
+            res= yield AsyncHTTPClient().fetch(req_URL,method='POST',body=JSON2URL(course_body),headers=course_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')

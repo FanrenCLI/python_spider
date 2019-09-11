@@ -1,7 +1,7 @@
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 from utils.json2url import JSON2URL
-
+from utils.IPProxyPool import Random_ProxyIP
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 @gen.coroutine
@@ -23,9 +23,16 @@ def grade_server(localcookie):
     }
     grade_body={
         'start':'0',
-        'pageSize':'100'
+        'pageSize':'99'
     }
-    res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')
 
 @gen.coroutine
@@ -47,7 +54,14 @@ def offset_grade_server(localcookie):
     }
     grade_body={
         'start':'0',
-        'pageSize':'100'
+        'pageSize':'99'
     }
-    res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header)
+    ip_proxy,proxy_port=Random_ProxyIP()
+    try:
+        res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header,proxy_host=ip_proxy,proxy_port=proxy_port)
+    except Exception:
+        try:
+            res= yield AsyncHTTPClient().fetch(req_url_login,method='POST',body=JSON2URL(grade_body),headers=grade_header)
+        except Exception:
+            return None
     return res.body.decode('utf-8')
